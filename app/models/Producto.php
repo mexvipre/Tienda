@@ -27,6 +27,20 @@ class Producto {
     // Método para actualizar un producto en la base de datos (PUT)
     public function update($id, $params) {
         try {
+            $tiposPermitidos = ['Camisa', 'Pantalón', 'Zapatos', 'Chompa', 'Short', 'Blusa'];
+            if (!in_array($params['tipo'], $tiposPermitidos)) {
+                return ['code' => 0, 'msg' => 'Tipo de producto inválido'];
+            }
+
+            $generosPermitidos = ['M', 'F', 'U'];
+            if (!in_array($params['genero'], $generosPermitidos)) {
+                return ['code' => 0, 'msg' => 'Género inválido'];
+            }
+
+            if (empty($params['talla']) || empty($params['precio'])) {
+                return ['code' => 0, 'msg' => 'Talla y precio son obligatorios'];
+            }
+
             $sql = "UPDATE productos SET tipo = ?, genero = ?, talla = ?, precio = ? WHERE id = ?";
             $consulta = $this->pdo->prepare($sql);
             $consulta->execute([$params['tipo'], $params['genero'], $params['talla'], $params['precio'], $id]);
@@ -65,6 +79,24 @@ class Producto {
             $consulta = $this->pdo->prepare($sql);
             $consulta->execute();
             return $consulta->fetchAll(PDO::FETCH_ASSOC);
+        } catch (Exception $e) {
+            return ['code' => 0, 'msg' => $e->getMessage()];
+        }
+    }
+
+    // 🔥 Método para obtener un producto por ID
+    public function getById($id) {
+        try {
+            $sql = "SELECT * FROM productos WHERE id = ?";
+            $consulta = $this->pdo->prepare($sql);
+            $consulta->execute([$id]);
+            $producto = $consulta->fetch(PDO::FETCH_ASSOC);
+
+            if ($producto) {
+                return ['code' => 1, 'producto' => $producto];
+            } else {
+                return ['code' => 0, 'msg' => 'Producto no encontrado'];
+            }
         } catch (Exception $e) {
             return ['code' => 0, 'msg' => $e->getMessage()];
         }
