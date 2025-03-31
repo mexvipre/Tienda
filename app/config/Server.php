@@ -7,8 +7,8 @@ define('PASS', '');
 class Conexion {
     // Método estático para obtener la conexión a la base de datos
     public static function getConexion() {
-        try {
-            // Crear una instancia de PDO para la conexión a la base de datos
+        try {   
+      
             $pdo = new PDO(SGBD, USER, PASS);
             $pdo->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             return $pdo;
